@@ -1,17 +1,19 @@
 # STM32F411E-discovery-starter
 
-Starter Project for STM32F411E discovery Board & Devlopment guidelines for Linux OS
+Starter Project for STM32F411E discovery Board & Devlopment setup guide for Linux OS.
 
 # Prerequisites
 
-1. Download [GNU Arm Embedded Toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
+How do I develop for the STM32F411E discovery board on Linux? Well it is quite simple. 
+
+1. Download & Extract [GNU Arm Embedded Toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads)
 2. Download, Install [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) and use it to download STM32F411E Board Firmware Package 
-4. Download [stlink](https://github.com/stlink-org/stlink)
-5. Build the stlink by using make
+3. Download [stlink](https://github.com/stlink-org/stlink)
+4. Build the stlink by using make
 ```
 sudo make
 ```
-5. Then create the paths to the compiler and stlink to make these avaiable. This is done by edditing the bashrc file in your home folder
+5. Then create the global paths to the compiler & stlink to make these avaiable for use everywhere. This is done by editing the bashrc file in your home folder
 ```
 sudo nano .bashrc
 ```
@@ -23,13 +25,52 @@ export PATH=$PATH:path-to-toolchain-folder/bin
 #St-link path
 export PATH=$PATH:path-to-stlink-folder/build/Release/bin
 ```
-6.Update your shell environment
+Update your shell environment
 ```
 source .bashrc
 ```
-Now you should be able to use & stlink
+Now you should be able to use gcc compiler for arm & stlink:
 ```
 arm-none-eabi-gcc --version
 st-info --version
 ```
-Notes: I've encountered an error preventing the use of st-info when the stlink was built without sudo command.
+Note: I've encountered an error preventing the use of st-info when the stlink was built without sudo command.
+
+6. Use st-info to probe for the board programmer:
+```
+st-info --probe
+```
+Note: If the st-info cannot find the st programmer, check if your OS detects the board.
+On linux - ubuntu:
+```
+lsusb
+```
+If the OS cannot find the board it might be due to board damage or you might be using a power only USB cable.
+
+Note: If you get an access error then you most likley need to allow users access to USB devices. Create a new udev rule by creating a file /etc/udev/rules/45-usb-stlink-v2.rules, make sure the number preceeding the rules filename is unique. 
+```
+sudo nano /etc/udev/rules/45-usb-stlink-v2.rules
+```
+Then add the following contents: 
+```
+#FT232
+ATTRS{idProduct}=="6014", ATTRS{idVendor}=="0403", MODE="666", GROUP="plugdev"
+
+#FT2232
+ATTRS{idProduct}=="6010", ATTRS{idVendor}=="0403", MODE="666", GROUP="plugdev"
+
+#FT230X
+ATTRS{idProduct}=="6015", ATTRS{idVendor}=="0403", MODE="666", GROUP="plugdev"
+
+#STLINK V1
+ATTRS{idProduct}=="3744", ATTRS{idVendor}=="0483", MODE="666", GROUP="plugdev"
+
+#STLINK V2
+ATTRS{idProduct}=="3748", ATTRS{idVendor}=="0483", MODE="666", GROUP="plugdev"
+```
+Save & reboot your system, or you can try restarting udev service by
+
+```
+sudo service udev restart
+```
+then unplug and plug back in your board.
