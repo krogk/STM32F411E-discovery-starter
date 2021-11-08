@@ -74,3 +74,17 @@ Save & reboot your system, or you can try restarting udev service by
 sudo service udev restart
 ```
 then unplug and plug back in your board.
+
+# STM32CubeMX Code generation
+
+The Drivers, Core and CubeMX folder contents in this repository have been generated using STM32CubeMX software, it is reccomended to genereate your own code and replace these folders, use Makefile for toolchain/ IDE option. The folder contents of the CubeMX contains the starup, linker scripts and the makefile which are in the root folder of the CubeMX generated project. The other two folders are directly copied.
+
+# Configuration
+
+In the main CMakeLists.txt you should:
+1. Set the project name
+2. Set the MCU family and model
+3. Set CPU parameters
+
+# About
+
